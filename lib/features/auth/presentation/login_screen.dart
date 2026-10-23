@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/constants/env_config.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/responsive_scaffold.dart';
+import 'auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -18,7 +20,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,21 +28,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _onLoginPressed() {
+  Future<void> _onLoginPressed() async {
     if (_formKey.currentState?.validate() ?? false) {
-      setState(() => _isLoading = true);
-      // Phase 1 navigation demo / Phase 2 full Supabase Auth wire-up
-      Future.delayed(const Duration(milliseconds: 600), () {
-        if (mounted) {
-          setState(() => _isLoading = false);
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
+      if (!EnvConfig.isConfigured) {
+        // Development demo mode when Supabase credentials are pending
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Supabase credentials not configured. Continuing in demo mode.'),
+            backgroundColor: AppColors.warning,
+          ),
+        );
+        context.go('/home');
+        return;
+      }
+
+      await ref.read(authControllerProvider.notifier).signIn(
+            email: email,
+            password: password,
+          );
+
+      final authState = ref.read(authControllerProvider);
+      if (mounted) {
+        if (authState.hasError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authState.error.toString()),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        } else if (authState.value != null) {
           context.go('/home');
         }
-      });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
+    final isLoading = authState.isLoading;
+
     return ResponsiveScaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -55,7 +84,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Container(
                   width: 64,
                   height: 64,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.primaryLight,
                     shape: BoxShape.circle,
                   ),
@@ -111,20 +140,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Password reset available in Phase 2.'),
-                      ),
-                    );
-                  },
+                  onPressed: () => context.go('/forgot-password'),
                   child: const Text('Forgot Password?'),
                 ),
               ),
               const SizedBox(height: 24),
               PrimaryButton(
                 text: 'Sign In',
-                isLoading: _isLoading,
+                isLoading: isLoading,
                 onPressed: _onLoginPressed,
               ),
               const SizedBox(height: 20),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/responsive_scaffold.dart';
+import '../../auth/presentation/auth_controller.dart';
 
 class HomePlaceholderScreen extends ConsumerStatefulWidget {
   const HomePlaceholderScreen({super.key});
@@ -27,7 +28,12 @@ class _HomePlaceholderScreenState extends ConsumerState<HomePlaceholderScreen> {
           IconButton(
             tooltip: 'Sign Out',
             icon: const Icon(Icons.logout_rounded),
-            onPressed: () => context.go('/login'),
+            onPressed: () async {
+              await ref.read(authControllerProvider.notifier).signOut();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
           ),
         ],
       ),

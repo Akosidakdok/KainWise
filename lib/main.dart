@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,11 +12,19 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: '.env');
   } catch (_) {
-    debugPrint('.env file not found, falling back to environment or defaults.');
+    if (kDebugMode) {
+      print('.env file not found, running in zero-cost standalone mode.');
+    }
   }
 
   // Initialize Supabase if credentials are provided
-  await SupabaseService.initialize();
+  try {
+    await SupabaseService.initialize();
+  } catch (e) {
+    if (kDebugMode) {
+      print('Supabase init skipped/failed: $e');
+    }
+  }
 
   runApp(
     const ProviderScope(

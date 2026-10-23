@@ -144,8 +144,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 onPressed: _onRegisterPressed,
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
                     'Already have an account?',

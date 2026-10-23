@@ -151,8 +151,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 onPressed: _onLoginPressed,
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
                     "Don't have an account?",

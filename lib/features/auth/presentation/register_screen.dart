@@ -44,7 +44,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             backgroundColor: AppColors.warning,
           ),
         );
-        context.go('/home');
+        context.go('/onboarding');
         return;
       }
 
@@ -64,7 +64,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
           );
         } else if (authState.value != null) {
-          context.go('/home');
+          context.go('/onboarding');
         }
       }
     }

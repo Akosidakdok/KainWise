@@ -8,17 +8,29 @@
       "program": "lib/main.dart",
       "args": [
         "-d",
-        "chrome"
+        "chrome",
+        "--web-port=3000"
       ]
     },
     {
-      "name": "KainWise (Edge)",
+      "name": "KainWise (Web Server)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
         "-d",
-        "edge"
+        "web-server",
+        "--web-port=3000"
+      ]
+    },
+    {
+      "name": "KainWise (Windows Desktop)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "-d",
+        "windows"
       ]
     }
   ]
